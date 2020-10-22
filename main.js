@@ -8,7 +8,8 @@ const Document = org.jsoup.nodes.Document;
 const Element = org.jsoup.nodes.Element;
 const Elements = org.jsoup.select.Elements;
 
-
+//https://api.hearthstonejson.com/v1/62331/koKR/cards.collectible.json
+//https://hearthstonejson.com/docs/cards.html 에서 하스스톤 카드 api 찾음.
 function parse(url){
 	var i, ii;
 	var str = "";
