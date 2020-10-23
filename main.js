@@ -26,12 +26,16 @@ function init(){
 
 	if(txt != null) {
 		var list = txt.split("\n");
+<<<<<<< HEAD
 		for (var i in list){
 			player.push(list[i].split(","));
 			player[player.length-1][1] = parseInt(player[player.length-1][1]);
 			player[player.length-1][2] = parseInt(player[player.length-1][2]);
 			player[player.length-1][3] = parseInt(player[player.length-1][3]);
 		}
+=======
+		for (var i in list) player.push(list[i].split(","));
+>>>>>>> 8fd1c5b0e3c6576fdbfb80bafc13a458286059f2
 		Log.i("[퀴즈] ["+getTime("G yyyy년 MM월 dd일 aa hh:mm:ss(E)")+"] LOG : 불러오기 완료\n");
 		saveFile(file+".backup",txt,false);
 	} else Log.i("[퀴즈] ["+getTime("G yyyy년 MM월 dd일 aa hh:mm:ss(E)")+"] LOG : 처음부터 기록\n");
@@ -66,7 +70,11 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
 			var arr = [sender, -1, 0, 0];
 			player.push(arr);
 		} else {
+<<<<<<< HEAD
 			if(s == -1) return;
+=======
+			if(player.length == 0) return;
+>>>>>>> 8fd1c5b0e3c6576fdbfb80bafc13a458286059f2
 			if(player[s][1] != -1) {
 				if(msg == name2[player[s][1]][0]) {
 					player[s][1] = -1;
@@ -95,10 +103,17 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
 			}
 		}
 		if(msg == "/랭킹" || msg == "/순위") {
+<<<<<<< HEAD
 			var rank = mergeSort(player);
 			var str = "";
 			for (var i=0; i<player.length; i++) {
 				str += ((i+1)+"위 : "+rank[i][0]+" : +"+rank[i][3]);
+=======
+			player = mergeSort(player);
+			var str = "";
+			for (var i=0; i<player.length; i++) {
+				str += (i+"위 : "+player[i][0]+" : +"+player[i][3]);
+>>>>>>> 8fd1c5b0e3c6576fdbfb80bafc13a458286059f2
 				if(i != player.length - 1) str += "\n";
 			}
 			replier.reply(room, str);
@@ -139,7 +154,11 @@ const mergeSort = function(array) {
 function merge(left, right) {
   let result = [];
   while (left.length && right.length) { // ___.length가 true일 때 === 배열 안에 값이 남아있을 때
+<<<<<<< HEAD
     if (left[0][3] >= right[0][3]) { 
+=======
+    if (left[0][3] <= right[0][3]) { 
+>>>>>>> 8fd1c5b0e3c6576fdbfb80bafc13a458286059f2
       result.push(left.shift()); // shift() 메서드는 배열에서 첫 번째 요소를 제거하고, 제거된 요소를 반환합니다.
     } else {
       result.push(right.shift()); 
@@ -236,4 +255,8 @@ function getTime(format) {
 	format=new java.text.SimpleDateFormat(format);
 	var cal=java.util.Calendar.getInstance();
 	return format.format(cal.getTime());
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 8fd1c5b0e3c6576fdbfb80bafc13a458286059f2
