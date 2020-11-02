@@ -1,27 +1,38 @@
+const kalingModule = require('kaling').Kakao();
+const Kakao = new kalingModule;
+
 const Jsoup = org.jsoup.Jsoup;
 const Document = org.jsoup.nodes.Document;
 const Element = org.jsoup.nodes.Element;
 const Elements = org.jsoup.select.Elements;
 
+const key = '';
+const email = ''; // email or phone number
+const pw = '';
+const id = 0;
+
+const sdcard = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
+const file = sdcard+"/퀴즈.txt";
+const cardClass = {"NEUTRAL" : "중립", "WARRIOR" : "전사", "SHAMAN" : "주술사", "ROGUE" : "도적", "PALADIN" : "성기사", "HUNTER" : "사냥꾼", "DRUID" : "드루이드", "WARLOCK" : "흑마법사", "MAGE" : "마법사", "PRIEST" : "사제", "DEMONHUNTER" : "악마사냥꾼"};
+const cardRarity = {"FREE" : "기본", "COMMON" : "일반", "RARE" : "희귀", "EPIC" : "특급", "LEGENDARY" : "전설"};
+let cards;
+
 var txt;
-var sdcard = android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
-var file = sdcard+"/퀴즈.txt";
-
-var name2 = new Array();
 var player = new Array();
-var s1 = null, s2 = null;
+var message = [null,null];
 
-//https://api.hearthstonejson.com/v1/62331/koKR/cards.collectible.json
-//https://hearthstonejson.com/docs/cards.html 에서 하스스톤 카드 api 찾음.
+
+
+
 
 init();
-
-var before = [null,null];
-
 function init(){
-	parse("https://namu.wiki/w/%ED%95%98%EC%8A%A4%EC%8A%A4%ED%86%A4/%EC%A7%81%EC%97%85%20%EC%A0%84%EC%9A%A9%20%EC%B9%B4%EB%93%9C");
-	parse("https://namu.wiki/w/%ED%95%98%EC%8A%A4%EC%8A%A4%ED%86%A4/%EA%B3%B5%EC%9A%A9%20%EC%B9%B4%EB%93%9C");
-
+	Kakao.init(key);
+	Kakao.login(email, pw);
+	cards = JSON.parse(Jsoup.connect("https://api.hearthstonejson.com/v1/62331/koKR/cards.collectible.json").ignoreContentType(true).execute().body());
+	//https://api.hearthstonejson.com/v1/62331/koKR/cards.collectible.json
+	//https://hearthstonejson.com/docs/cards.html 에서 하스스톤 카드 api 찾음.
+	//https://art.hearthstonejson.com/v1/512x/EX1_001.jpg
 	txt = readFile(file);
 
 	if(txt != null) {
@@ -38,27 +49,16 @@ function init(){
 
 }
 
-function makeTXT() {
-	txt = "";
-	for (var i in player) {
-		txt += player[i].join(",");
-		if(i < player.length - 1) txt += "\n";
-	}
-	saveFile(file,txt,false);
-	Log.i("[퀴즈] ["+getTime("G yyyy년 MM월 dd일 aa hh:mm:ss(E)")+"] LOG : 저장완료\n");
-	
-}
-
 function response(room, msg, sender, isGroupChat, replier, imageDB, packageName) {
-	if(before[0] == room && before[1] == msg){
-		Log.e("중복되는 메세지, "+before.join(","));
+	if(message[0] == room && message[1] == msg){
+		Log.e("중복되는 메세지, "+message.join(","));
 		return;
 	}
-	before[0] = room;
-	before[1] = msg;
+	message[0] = room;
+	message[1] = msg;
 	if(isGroupChat) {
 		if(msg == "/help") {
-			replier.reply(room, "자음퀴즈 ver 1.0\n\"/하스카드퀴즈\" or \"애니제목퀴즈\"\n버그개많음");
+			replier.reply(room, "자음퀴즈 ver 1.0\n\"/하스카드퀴즈\"\n버그개많음");
 		}
 		var s = indexOf(sender, 0);
 		if((msg == "/하스카드퀴즈") && s == -1) {
@@ -68,7 +68,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
 		} else {
 			if(s == -1) return;
 			if(player[s][1] != -1) {
-				if(msg == name2[player[s][1]][0]) {
+				if(msg == cards[player[s][1]].name) {
 					player[s][1] = -1;
 					player[s][2] = 0;
 					player[s][3] ++;
@@ -77,17 +77,20 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
 				} else {
 					player[s][2] --;
 					if(player[s][2] != 0) {
-						replier.reply(room, "오답!\n"+sender+"님의 문제입니다.\n이름 : "+cho_hangul(name2[player[s][1]][0])+"\n"+name2[player[s][1]][1]+"코스트 "+name2[player[s][1]][2]+" "+name2[player[s][1]][3]+"카드\n남은기회 : "+player[s][2]+"번");
+						//replier.reply(room, "오답!\n"+sender+"님의 문제입니다.\n이름 : "+cho_hangul(cards[player[s][1]].name)+"\n"+cards[player[s][1]].cost+"코스트 "+getCardClass(cards[player[s][1]].cardClass)+" "+cardRarity[cards[player[s][1]].rarity]+"카드\n남은기회 : "+player[s][2]+"번");
+						sendImage(room, sender+" 오답!", "남은기회 : "+player[s][2]+"번", "https://art.hearthstonejson.com/v1/512x/"+cards[player[s][1]].id+".jpg");
+						
 					} else {
 						if(player[s][3] > 0)player[s][3]--;
-						replier.reply(room, "오답!\n정답은 "+name2[player[s][1]][0]+"이었습니다!\n현재 하스뒷면퀴즈 점수 :  "+player[s][3]);
+						replier.reply(room, "오답!\n정답은 "+cards[player[s][1]].name+"이었습니다!\n현재 하스퀴즈 점수 :  "+player[s][3]);
 						player[s][1] = -1;
 					}
 				}
 			} else {
 				if(msg == "/하스카드퀴즈") {
-					var s2 = Math.floor(Math.random() * name2.length);
-					replier.reply(room, sender+"님의 문제입니다.\n이름 : "+cho_hangul(name2[s2][0])+"\n"+name2[s2][1]+"코스트 "+name2[s2][2]+" "+name2[s2][3]+"카드\n남은기회 : 3번");
+					var s2 = Math.floor(Math.random() * cards.length);
+					//replier.reply(room, sender+"님의 문제입니다.\n이름 : "+cho_hangul(cards[s2].name)+"\n"+cards[s2].cost+"코스트 "+getCardClass(cards[s2].cardClass)+" "+cardRarity[cards[s2].rarity]+"카드\n남은기회 : 3번");
+					sendImage(room, sender+"님의 문제입니다.", "남은기회 : 3번", "https://art.hearthstonejson.com/v1/512x/"+cards[s2].id+".jpg");
 					player[s][1] = s2;
 					player[s][2] = 3;
 				} else {
@@ -106,26 +109,26 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
 	}
 }
 
-function parse(url) {
-	var table = Jsoup.connect(url).execute().parse().body().getElementsByClass("wiki-heading-content");
-	for (var i = 2; i < table.size(); i ++) {
-		if(table.get(i).getElementsByClass("wiki-table-wrap").size() > 0) {
-			var cards = table.get(i).getElementsByClass("wiki-table-wrap").get(0).child(0).child(0).children();
-			for (var ii = 1; ii < cards.size(); ii ++) {
-				var card = cards.get(ii);
-				if(card.children().size() != 4) continue;
-				if(isNaN(card.child(1).child(0).ownText())) continue;
-				var arr = new Array();
-				arr.push(card.child(0).child(0).child(0).ownText());
-				arr.push(card.child(1).child(0).ownText());
-				arr.push(card.child(2).child(0).ownText());
-				arr.push(card.child(3).child(0).ownText());
-				name2.push(arr);
-			}
-		}
-	}
+function sendImage(room, title, context, img){
+	Kakao.send(room, {
+	"link_ver": "4.0",
+	"template_id": id ,
+	"template_args": {
+		"img" : img,
+		"data1": title,
+		"data2": context
+	}}, "custom");
 }
 
+function getCardClass(c){
+	var arr;
+	if(Array.isArray(c)) arr = c;
+	else arr = [c];
+	for(var i in arr){
+		arr[i] = cardClass[arr[i]];
+	}
+	return arr.join("/");
+}
 
 
 
@@ -169,6 +172,17 @@ function indexOf(str, num) {
 	return -1;
 }
 
+
+function makeTXT() {
+	txt = "";
+	for (var i in player) {
+		txt += player[i].join(",");
+		if(i < player.length - 1) txt += "\n";
+	}
+	saveFile(file,txt,false);
+	Log.i("[퀴즈] ["+getTime("G yyyy년 MM월 dd일 aa hh:mm:ss(E)")+"] LOG : 저장완료\n");
+	
+}
 
 function readFile(path) {
 	try {
@@ -237,3 +251,21 @@ function getTime(format) {
 	var cal=java.util.Calendar.getInstance();
 	return format.format(cal.getTime());
 }
+
+
+
+
+function onCreate(savedInstanceState, activity) {
+  var textView = new android.widget.TextView(activity);
+  textView.setText("Hello, World!");
+  textView.setTextColor(android.graphics.Color.DKGRAY);
+  activity.setContentView(textView);
+}
+
+function onStart(activity) {}
+
+function onResume(activity) {}
+
+function onPause(activity) {}
+
+function onStop(activity) {}
