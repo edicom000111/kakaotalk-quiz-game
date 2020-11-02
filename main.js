@@ -58,7 +58,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
 	message[1] = msg;
 	if(isGroupChat) {
 		if(msg == "/help") {
-			replier.reply(room, "자음퀴즈 ver 1.0\n\"/하스카드퀴즈\"\n버그개많음");
+			replier.reply(room, "하스스톤퀴즈 ver 2.0\n\"/하스카드퀴즈\"\n버그개많음");
 		}
 		var s = indexOf(sender, 0);
 		if((msg == "/하스카드퀴즈") && s == -1) {
@@ -77,7 +77,6 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
 				} else {
 					player[s][2] --;
 					if(player[s][2] != 0) {
-						//replier.reply(room, "오답!\n"+sender+"님의 문제입니다.\n이름 : "+cho_hangul(cards[player[s][1]].name)+"\n"+cards[player[s][1]].cost+"코스트 "+getCardClass(cards[player[s][1]].cardClass)+" "+cardRarity[cards[player[s][1]].rarity]+"카드\n남은기회 : "+player[s][2]+"번");
 						sendImage(room, sender+" 오답!", "남은기회 : "+player[s][2]+"번", "https://art.hearthstonejson.com/v1/512x/"+cards[player[s][1]].id+".jpg");
 						
 					} else {
@@ -89,7 +88,6 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
 			} else {
 				if(msg == "/하스카드퀴즈") {
 					var s2 = Math.floor(Math.random() * cards.length);
-					//replier.reply(room, sender+"님의 문제입니다.\n이름 : "+cho_hangul(cards[s2].name)+"\n"+cards[s2].cost+"코스트 "+getCardClass(cards[s2].cardClass)+" "+cardRarity[cards[s2].rarity]+"카드\n남은기회 : 3번");
 					sendImage(room, sender+"님의 문제입니다.", "남은기회 : 3번", "https://art.hearthstonejson.com/v1/512x/"+cards[s2].id+".jpg");
 					player[s][1] = s2;
 					player[s][2] = 3;
