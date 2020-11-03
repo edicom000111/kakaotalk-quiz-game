@@ -88,7 +88,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
 			} else {
 				if(msg == "/하스카드퀴즈") {
 					var s2 = Math.floor(Math.random() * cards.length);
-					sendImage(room, sender+"님의 문제입니다.", "남은기회 : 3번", "https://art.hearthstonejson.com/v1/512x/"+cards[s2].id+".jpg");
+					sendImage(room, sender+"님의 문제입니다.", cards[s2].flavor, "https://art.hearthstonejson.com/v1/512x/"+cards[s2].id+".jpg");
 					player[s][1] = s2;
 					player[s][2] = 3;
 				} else {
