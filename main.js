@@ -77,7 +77,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
 				} else {
 					player[s][2] --;
 					if(player[s][2] != 0) {
-						sendImage(room, sender+" 오답!", "남은기회 : "+player[s][2]+"번", "https://art.hearthstonejson.com/v1/512x/"+cards[player[s][1]].id+".jpg");
+						sendImage(room, cho_hangul(cards[player[s][1]].name), sender+"님의 남은기회 : "+player[s][2]+"번", "https://art.hearthstonejson.com/v1/512x/"+cards[player[s][1]].id+".jpg");
 						
 					} else {
 						if(player[s][3] > 0)player[s][3]--;
@@ -88,7 +88,7 @@ function response(room, msg, sender, isGroupChat, replier, imageDB, packageName)
 			} else {
 				if(msg == "/하스카드퀴즈") {
 					var s2 = Math.floor(Math.random() * cards.length);
-					sendImage(room, sender+"님의 문제입니다.", cards[s2].flavor, "https://art.hearthstonejson.com/v1/512x/"+cards[s2].id+".jpg");
+					sendImage(room, cho_hangul(cards[s2].name), cards[s2].flavor, "https://art.hearthstonejson.com/v1/512x/"+cards[s2].id+".jpg");
 					player[s][1] = s2;
 					player[s][2] = 3;
 				} else {
